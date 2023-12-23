@@ -1,20 +1,13 @@
 class ListRestaurants {
   String error;
-  String message;
-  String total;
+
   List<Restaurants> restaurants;
 
-  ListRestaurants(
-      {required this.error,
-      required this.message,
-      required this.total,
-      required this.restaurants});
+  ListRestaurants({required this.error, required this.restaurants});
 
   factory ListRestaurants.fromJson(Map<String, dynamic> json) =>
       ListRestaurants(
           error: json['error'].toString(),
-          message: json['message'],
-          total: json['count'].toString(),
           restaurants: List<Restaurants>.from(
               json['restaurants'].map((x) => Restaurants.fromJson(x))));
 }

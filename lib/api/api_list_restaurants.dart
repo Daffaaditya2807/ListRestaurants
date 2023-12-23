@@ -4,7 +4,7 @@ import 'dart:convert';
 import '../model/list_restaurants.dart';
 
 class ApiListRestaurants {
-  static Future<ListRestaurants> fetctDataRestaurant() async {
+  Future<ListRestaurants> fetctDataRestaurant() async {
     final response =
         await http.get(Uri.parse("https://restaurant-api.dicoding.dev/list"));
     if (response.statusCode == 200) {
