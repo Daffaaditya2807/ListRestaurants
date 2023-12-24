@@ -210,7 +210,10 @@ class _PageListRestaurantsState extends State<PageListRestaurants> {
                                   padding: const EdgeInsets.all(8.0),
                                   child: Row(
                                     children: [
-                                      Icon(Icons.fmd_good_rounded),
+                                      Icon(
+                                        Icons.fmd_good_rounded,
+                                        color: Colors.redAccent,
+                                      ),
                                       SizedBox(
                                         width: 5.0,
                                       ),

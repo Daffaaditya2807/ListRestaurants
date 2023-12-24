@@ -5,6 +5,7 @@ import 'package:restaurant_with_api/model/list_restaurants.dart';
 import 'package:restaurant_with_api/page/page_cari_list_restaurants.dart';
 import 'package:restaurant_with_api/page/page_detail_restaurants.dart';
 import 'package:restaurant_with_api/page/page_list_restaurant.dart';
+import 'package:restaurant_with_api/page/page_solash_screen.dart';
 import 'package:restaurant_with_api/provider/connectionprovider.dart';
 
 void main() {
@@ -21,8 +22,9 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: 'Restaurants Apps',
         debugShowCheckedModeBanner: false,
-        initialRoute: PageListRestaurants.routeName,
+        initialRoute: SplashScreen.routeName,
         routes: {
+          SplashScreen.routeName: (context) => SplashScreen(),
           PageListRestaurants.routeName: (context) => PageListRestaurants(),
           PageDetailRestaurants.routeName: (context) => PageDetailRestaurants(
               restaurants:

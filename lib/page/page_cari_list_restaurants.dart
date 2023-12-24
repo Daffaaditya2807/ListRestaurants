@@ -95,26 +95,34 @@ class _PageCariListRestaurantsState extends State<PageCariListRestaurants> {
                     children: [
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                        child: Container(
-                          height: heightSearch,
-                          decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(10),
-                              border: Border.all(color: Colors.grey)),
-                          child: TextField(
-                            controller: _controllerCari,
-                            autofocus: true,
-                            onSubmitted: (value) {
-                              _search(key: _controllerCari.text);
-                            },
-                            decoration: const InputDecoration(
-                                prefixIcon: Icon(Icons.search),
-                                hintText: "Cari Restaurants Favoritemu!",
-                                hintStyle: TextStyle(fontSize: 12),
-                                suffixIcon: Icon(Icons.fastfood_sharp),
-                                border: UnderlineInputBorder(
-                                    borderSide: BorderSide.none)),
-                          ),
+                        child: TextField(
+                          controller: _controllerCari,
+                          style: TextStyle(fontSize: 12.0),
+                          autofocus: true,
+                          cursorColor: Colors.grey,
+                          onSubmitted: (value) {
+                            _search(key: _controllerCari.text);
+                          },
+                          decoration: const InputDecoration(
+                              prefixIcon: Icon(
+                                Icons.search,
+                                size: 20.0,
+                              ),
+                              hintText: "Cari Restaurants Favoritemu!",
+                              hintStyle: TextStyle(fontSize: 12),
+                              suffixIcon: Icon(
+                                Icons.fastfood_sharp,
+                                size: 20.0,
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(20)),
+                                  borderSide: BorderSide(
+                                      color: Colors.black38, width: 1.5)),
+                              border: OutlineInputBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(20)),
+                                  borderSide: BorderSide(color: Colors.grey))),
                         ),
                       ),
                       _isLoading
@@ -126,7 +134,9 @@ class _PageCariListRestaurantsState extends State<PageCariListRestaurants> {
                                   height: bodyHeight,
                                   child: const Center(
                                       child: Text(
-                                          "Silakan Cari Restaurants \nBerdasarkan Nama , Kategori")))
+                                    "Silakan Cari Restaurants \nBerdasarkan Nama atau Kategori",
+                                    textAlign: TextAlign.center,
+                                  )))
                               : _listRestaurants!.restaurants.length != 0
                                   ? ListView.builder(
                                       itemCount:

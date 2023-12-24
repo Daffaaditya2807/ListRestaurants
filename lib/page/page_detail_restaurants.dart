@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:developer' as developer;
 
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -25,6 +26,7 @@ class PageDetailRestaurants extends StatefulWidget {
 class _DetailRestaurantsState extends State<PageDetailRestaurants> {
   late Future<DetailRestaurants> restaurant;
   bool addreviews = false;
+  final _formKey = GlobalKey<FormState>();
 
   TextEditingController _nama = TextEditingController();
   TextEditingController _comment = TextEditingController();
@@ -44,6 +46,13 @@ class _DetailRestaurantsState extends State<PageDetailRestaurants> {
     restaurant = ApiDetailRestaurants()
         .fetchRestaurant(idRestaurants: widget.restaurants.id);
     print("id Detail : ${widget.restaurants.id}");
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+
+    super.dispose();
   }
 
   //Handle Koneksi
@@ -247,57 +256,93 @@ class _DetailRestaurantsState extends State<PageDetailRestaurants> {
                                       child: Padding(
                                         padding: const EdgeInsets.all(8.0),
                                         child: Form(
+                                            key: _formKey,
                                             child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            InputReviews(
-                                                controller: _nama,
-                                                label: "Name"),
-                                            InputReviews(
-                                                controller: _comment,
-                                                label: "Reviews"),
-                                            ElevatedButton(
-                                                onPressed: () {
-                                                  ApiAddReviews.InsertReviews(
-                                                          id: widget
-                                                              .restaurants.id
-                                                              .toString(),
-                                                          name: _nama.text,
-                                                          reviews:
-                                                              _comment.text)
-                                                      .then((value) => {
-                                                            print(
-                                                                "${value.message}")
-                                                          });
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                InputReviews(
+                                                    controller: _nama,
+                                                    icons: Icons.person,
+                                                    label: "Name"),
+                                                InputReviews(
+                                                    controller: _comment,
+                                                    icons: Icons.comment,
+                                                    label: "Reviews"),
+                                                ElevatedButton(
+                                                    onPressed: () {
+                                                      if (_formKey.currentState!
+                                                          .validate()) {
+                                                        ApiAddReviews.InsertReviews(
+                                                                id: widget
+                                                                    .restaurants
+                                                                    .id
+                                                                    .toString(),
+                                                                name:
+                                                                    _nama.text,
+                                                                reviews:
+                                                                    _comment
+                                                                        .text)
+                                                            .then((value) {
+                                                          print(
+                                                              "${value.message}");
+                                                          final snackBar =
+                                                              SnackBar(
+                                                            /// need to set following properties for best effect of awesome_snackbar_content
+                                                            elevation: 0,
+                                                            behavior:
+                                                                SnackBarBehavior
+                                                                    .floating,
+                                                            backgroundColor:
+                                                                Colors
+                                                                    .transparent,
+                                                            content:
+                                                                AwesomeSnackbarContent(
+                                                              title:
+                                                                  '${value.message}',
+                                                              message:
+                                                                  ' Send Reviews',
 
-                                                  updateRestaurantData();
-                                                  _comment.clear();
-                                                },
-                                                style: ElevatedButton.styleFrom(
-                                                    minimumSize:
-                                                        Size.fromHeight(50),
-                                                    backgroundColor: Colors
-                                                        .white,
-                                                    foregroundColor: Colors
-                                                        .blue.shade200,
-                                                    side: const BorderSide(
-                                                        color: Colors.grey),
-                                                    shape:
-                                                        RoundedRectangleBorder(
+                                                              /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
+                                                              contentType:
+                                                                  ContentType
+                                                                      .success,
+                                                            ),
+                                                          );
+                                                          ScaffoldMessenger.of(
+                                                              context)
+                                                            ..hideCurrentSnackBar()
+                                                            ..showSnackBar(
+                                                                snackBar);
+                                                        });
+
+                                                        updateRestaurantData();
+                                                        _comment.clear();
+                                                      }
+                                                    },
+                                                    style: ElevatedButton.styleFrom(
+                                                        minimumSize:
+                                                            Size.fromHeight(50),
+                                                        backgroundColor:
+                                                            Colors.white,
+                                                        foregroundColor: Colors
+                                                            .blue.shade200,
+                                                        side: const BorderSide(
+                                                            color: Colors.grey),
+                                                        shape: RoundedRectangleBorder(
                                                             borderRadius:
                                                                 BorderRadius
                                                                     .circular(
                                                                         10))),
-                                                child: const Text(
-                                                  "Send Reviews",
-                                                  style: TextStyle(
-                                                      color: Colors.black,
-                                                      fontWeight:
-                                                          FontWeight.bold),
-                                                ))
-                                          ],
-                                        )),
+                                                    child: const Text(
+                                                      "Send Reviews",
+                                                      style: TextStyle(
+                                                          color: Colors.black,
+                                                          fontWeight:
+                                                              FontWeight.bold),
+                                                    ))
+                                              ],
+                                            )),
                                       ),
                                       // Anda bisa menambahkan child jika perlu
                                     ), // Widget saat addreviews true
@@ -463,20 +508,33 @@ class _DetailRestaurantsState extends State<PageDetailRestaurants> {
     );
   }
 
-  Widget InputReviews({TextEditingController? controller, String? label}) {
+  Widget InputReviews(
+      {TextEditingController? controller, String? label, IconData? icons}) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 10.0),
       child: TextFormField(
         style: const TextStyle(fontSize: 12),
+        validator: (value) {
+          if (value!.isEmpty) {
+            return 'Please enter some text';
+          }
+          return null;
+        },
         cursorColor: Colors.grey.shade400,
         controller: controller,
+        onChanged: (value) {
+          print(value);
+        },
         decoration: InputDecoration(
             label: Text("${label}"),
-            prefixIcon: Icon(Icons.person),
+            prefixIcon: Icon(icons),
             labelStyle: TextStyle(fontSize: 12, color: Colors.black),
             contentPadding: EdgeInsets.all(10),
             border: const OutlineInputBorder(
                 borderSide: BorderSide(color: Colors.grey)),
+            errorBorder: controller!.text.isEmpty
+                ? OutlineInputBorder(borderSide: BorderSide(color: Colors.red))
+                : OutlineInputBorder(),
             focusedBorder: const OutlineInputBorder(
                 borderSide: BorderSide(color: Colors.grey))),
       ),
