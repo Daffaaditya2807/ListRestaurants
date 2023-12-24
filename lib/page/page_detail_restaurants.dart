@@ -301,7 +301,7 @@ class _DetailRestaurantsState extends State<PageDetailRestaurants> {
                                                               title:
                                                                   '${value.message}',
                                                               message:
-                                                                  ' Send Reviews',
+                                                                  ' Send Reviews success',
 
                                                               /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
                                                               contentType:
