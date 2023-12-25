@@ -60,7 +60,7 @@ class RestaurantsProvider extends ChangeNotifier {
     } on SocketException {
       _state = ResulState.error;
       notifyListeners();
-      _message = 'No Internet Connection. Please check your network settings.';
+      _message = '404';
     } catch (e) {
       _state = ResulState.error;
       notifyListeners();

@@ -22,40 +22,10 @@ class _PageListRestaurantsState extends State<PageListRestaurants> {
   String? _currentAddress;
   Position? _currentPosition;
 
-  // //Koneksi
-  // ConnectivityResult _connectionStatus = ConnectivityResult.none;
-  // final Connectivity _connectivity = Connectivity();
-  // late StreamSubscription<ConnectivityResult> _connectivitySubscription;
-
-  // //Handle Koneksi
-  // Future<void> initConnectivity() async {
-  //   late ConnectivityResult result;
-  //   try {
-  //     result = await _connectivity.checkConnectivity();
-  //   } on PlatformException catch (e) {
-  //     developer.log('Couldn\'t check connectivity status', error: e);
-  //     return;
-  //   }
-  //   if (!mounted) {
-  //     return Future.value(null);
-  //   }
-  //   return _updateConnectionStatus(result);
-  // }
-
-  // //update Koneksi
-  // Future<void> _updateConnectionStatus(ConnectivityResult result) async {
-  //   setState(() {
-  //     _connectionStatus = result;
-  //   });
-  // }
-
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    // initConnectivity();
-    // _connectivitySubscription =
-    //     _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
     _determinePosition();
     _getCurrentPosition();
   }
@@ -423,12 +393,15 @@ class _PageListRestaurantsState extends State<PageListRestaurants> {
                   ),
                 );
               } else if (state.state == ResulState.error) {
-                print(state.message);
-                return Center(
-                  child: Material(
-                    child: Text(state.message),
-                  ),
-                );
+                if (state.message == '404') {
+                  return ComponentWidget.BoxRestaurantApi();
+                } else {
+                  return Center(
+                    child: Material(
+                      child: Text(state.message),
+                    ),
+                  );
+                }
               } else {
                 return Center(
                   child: Material(

@@ -134,7 +134,6 @@ class _DetailRestaurantsState extends State<PageDetailRestaurants> {
               width: double.infinity,
               height: 200,
               decoration: BoxDecoration(
-                  color: Colors.amber,
                   image: DecorationImage(
                       image: NetworkImage(
                           "https://restaurant-api.dicoding.dev/images/large/${restaurants!.pictureId}"),
