@@ -375,6 +375,7 @@ class _PageListRestaurantsState extends State<PageListRestaurants> {
                   child: CircularProgressIndicator(),
                 );
               } else if (state.state == ResulState.hasData) {
+                print("kesini ka?");
                 return ListView.builder(
                   shrinkWrap: true,
                   physics: NeverScrollableScrollPhysics(),
@@ -393,8 +394,9 @@ class _PageListRestaurantsState extends State<PageListRestaurants> {
                   ),
                 );
               } else if (state.state == ResulState.error) {
+                print(state.message);
                 if (state.message == '404') {
-                  return ComponentWidget.BoxRestaurantApi();
+                  return ComponentWidget.NoInternet();
                 } else {
                   return Center(
                     child: Material(
