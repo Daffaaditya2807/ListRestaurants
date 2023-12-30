@@ -6,10 +6,13 @@ import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:provider/provider.dart';
+import 'package:restaurant_with_api/database/db_model_restaurants.dart';
 import 'package:restaurant_with_api/page/page_cari_list_restaurants.dart';
-import 'package:restaurant_with_api/provider/connectionprovider.dart';
+import 'package:restaurant_with_api/page/page_list_favorite_restaurants.dart';
+import 'package:restaurant_with_api/provider/provider_list_restaurants.dart';
 
 import '../component/widget_build.dart';
+import '../model/list_restaurants.dart';
 import 'page_detail_restaurants.dart';
 
 class PageListRestaurants extends StatefulWidget {
@@ -118,306 +121,484 @@ class _PageListRestaurantsState extends State<PageListRestaurants> {
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
-    return Scaffold(
-        body: SafeArea(
-            child: SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: double.infinity,
-            height: 300,
-            child: Stack(
-              children: [
-                Container(
+    return Scaffold(body: SafeArea(
+      child: Consumer<RestaurantsProvider>(
+        builder: (context, state, _) {
+          if (state.state == ResulState.loading) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          } else if (state.state == ResulState.hasData) {
+            print("kesini ka?");
+            return SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
                     width: double.infinity,
-                    color: Colors.green,
-                    child: CarouselSlider(
-                      options: CarouselOptions(
-                          height: 250,
-                          viewportFraction: 1.0,
-                          autoPlay: true,
-                          enlargeStrategy: CenterPageEnlargeStrategy.scale),
-                      items: p
-                          .map((item) => Container(
-                                width: double.infinity,
-                                child: Image.asset(
-                                  item,
-                                  fit: BoxFit.cover,
-                                  scale: 20,
-                                ),
-                              ))
-                          .toList(),
-                    )),
-                Positioned(
-                  top: 10,
-                  left: 5,
-                  child: Row(
-                    children: [
-                      IconButton.filled(
-                        onPressed: () {},
-                        icon: Icon(Icons.arrow_back),
-                        style: ButtonStyle(
-                            backgroundColor:
-                                MaterialStatePropertyAll(Colors.white)),
-                        color: Colors.black,
-                      ),
-                      SizedBox(
-                        width: 10,
-                      ),
-                      Container(
-                        decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(10)),
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Row(
-                            children: [
-                              const Icon(
-                                Icons.fmd_good_rounded,
-                                color: Colors.redAccent,
-                              ),
-                              const SizedBox(
-                                width: 5.0,
-                              ),
-                              Text("${_currentAddress ?? "Mencari Alamat..."}"),
-                            ],
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-                Positioned(
-                  bottom: 25,
-                  left: 0,
-                  right: 0,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 50),
-                    child: Container(
-                      height: 50,
-                      decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: Colors.grey)),
-                      child: TextField(
-                        onTap: () {
-                          Navigator.pushNamed(
-                              context, PageCariListRestaurants.routeName);
-                        },
-                        enabled: true,
-                        readOnly: true,
-                        decoration: const InputDecoration(
-                            prefixIcon: Icon(Icons.search),
-                            hintText: "Cari Restaurants Favoritemu!",
-                            hintStyle: TextStyle(fontSize: 12),
-                            suffixIcon: Icon(Icons.fastfood_sharp),
-                            border: UnderlineInputBorder(
-                                borderSide: BorderSide.none)),
-                      ),
-                    ),
-                  ),
-                )
-              ],
-            ),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              Container(
-                width: 100,
-                height: 100,
-                decoration: BoxDecoration(
-                    color: Colors.white,
-                    border: Border.all(color: Colors.grey),
-                    borderRadius: BorderRadius.circular(10)),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Image.asset("assets/badge.png"),
-                    Text("Murah", style: TextStyle(fontWeight: FontWeight.bold))
-                  ],
-                ),
-              ),
-              Container(
-                width: 100,
-                height: 100,
-                decoration: BoxDecoration(
-                    color: Colors.white,
-                    border: Border.all(color: Colors.grey),
-                    borderRadius: BorderRadius.circular(10)),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Image.asset("assets/loved.png"),
-                    Text(
-                      "Favorite",
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    )
-                  ],
-                ),
-              ),
-              Container(
-                width: 100,
-                height: 100,
-                decoration: BoxDecoration(
-                    color: Colors.white,
-                    border: Border.all(color: Colors.grey),
-                    borderRadius: BorderRadius.circular(10)),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Image.asset("assets/maps.png"),
-                    Text("Terlaris",
-                        style: TextStyle(fontWeight: FontWeight.bold))
-                  ],
-                ),
-              ),
-            ],
-          ),
-          SizedBox(
-            height: 10,
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10.0),
-            child: Text(
-              "Khusus Buat Kamu",
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.0),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10.0),
-            child: Text(
-              "Promo spesial untuk dipakai waktu checkout",
-              style: TextStyle(fontSize: 12),
-            ),
-          ),
-          SizedBox(
-            width: double.infinity,
-            height: 120,
-            child: ListView.builder(
-              shrinkWrap: true,
-              itemCount: 2,
-              scrollDirection: Axis.horizontal,
-              itemBuilder: (context, index) {
-                return Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Container(
-                    width: 280,
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        color: Color.fromRGBO(250, 222, 222, 1)),
-                    child: Row(
+                    height: 300,
+                    child: Stack(
                       children: [
                         Container(
-                          width: 100,
-                          height: 120,
-                          decoration: BoxDecoration(
-                              color: Color.fromRGBO(249, 186, 186, 1),
-                              image: DecorationImage(
-                                  image: AssetImage("assets/disc.png")),
-                              borderRadius: BorderRadius.circular(10)),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                            width: double.infinity,
+                            color: Colors.green,
+                            child: CarouselSlider(
+                              options: CarouselOptions(
+                                  height: 250,
+                                  viewportFraction: 1.0,
+                                  autoPlay: true,
+                                  enlargeStrategy:
+                                      CenterPageEnlargeStrategy.scale),
+                              items: p
+                                  .map((item) => Container(
+                                        width: double.infinity,
+                                        child: Image.asset(
+                                          item,
+                                          fit: BoxFit.cover,
+                                          scale: 20,
+                                        ),
+                                      ))
+                                  .toList(),
+                            )),
+                        Positioned(
+                          top: 10,
+                          left: 5,
+                          child: Row(
                             children: [
-                              Text(
-                                "Special Discount!",
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
-                                    color: Color.fromRGBO(204, 121, 121, 1)),
+                              IconButton.filled(
+                                onPressed: () {},
+                                icon: Icon(Icons.arrow_back),
+                                style: ButtonStyle(
+                                    backgroundColor:
+                                        MaterialStatePropertyAll(Colors.white)),
+                                color: Colors.black,
+                              ),
+                              SizedBox(
+                                width: 10,
                               ),
                               Container(
-                                width: 150,
-                                child: Text(
-                                  "Diskon Makanan Murah sampai 20% tiap beli 20rb",
-                                  style: TextStyle(fontSize: 10.0),
+                                decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(10)),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Row(
+                                    children: [
+                                      const Icon(
+                                        Icons.fmd_good_rounded,
+                                        color: Colors.redAccent,
+                                      ),
+                                      const SizedBox(
+                                        width: 5.0,
+                                      ),
+                                      Text(
+                                          "${_currentAddress ?? "Mencari Alamat..."}"),
+                                    ],
+                                  ),
                                 ),
                               )
                             ],
+                          ),
+                        ),
+                        Positioned(
+                          bottom: 25,
+                          left: 0,
+                          right: 0,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 50),
+                            child: Container(
+                              height: 50,
+                              decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(color: Colors.grey)),
+                              child: TextField(
+                                onTap: () async {
+                                  // Navigator.pushNamed(
+                                  //     context, PageCariListRestaurants.routeName);
+
+                                  bool result = await Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            PageCariListRestaurants(),
+                                      ));
+                                  print("Hasil Route ${result}");
+                                  if (result == true) {
+                                    state.getAllRestaurantsdb();
+                                    state.loadFavorite();
+                                    print("gassin sini");
+                                  }
+                                },
+                                enabled: true,
+                                readOnly: true,
+                                decoration: const InputDecoration(
+                                    prefixIcon: Icon(Icons.search),
+                                    hintText: "Cari Restaurants Favoritemu!",
+                                    hintStyle: TextStyle(fontSize: 12),
+                                    suffixIcon: Icon(Icons.fastfood_sharp),
+                                    border: UnderlineInputBorder(
+                                        borderSide: BorderSide.none)),
+                              ),
+                            ),
                           ),
                         )
                       ],
                     ),
                   ),
-                );
-              },
-            ),
-          ),
-          SizedBox(
-            height: 10,
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10.0),
-            child: Text(
-              "Restaurants Yang Cocok Buat Kamu",
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.0),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10.0),
-            child: Text(
-              "Makanan Enak , Minuman Enak dan Murah pasti ada!",
-              style: TextStyle(fontSize: 12),
-            ),
-          ),
-          SizedBox(
-            height: 10,
-          ),
-          Consumer<RestaurantsProvider>(
-            builder: (context, state, _) {
-              if (state.state == ResulState.loading) {
-                return const Center(
-                  child: CircularProgressIndicator(),
-                );
-              } else if (state.state == ResulState.hasData) {
-                print("kesini ka?");
-                return ListView.builder(
-                  shrinkWrap: true,
-                  physics: NeverScrollableScrollPhysics(),
-                  itemCount: state.result.restaurants.length,
-                  itemBuilder: (context, index) {
-                    return ComponentWidget.BoxRestaurantApi(
-                        data: state.result.restaurants[index],
-                        context: context,
-                        route: PageDetailRestaurants.routeName);
-                  },
-                );
-              } else if (state.state == ResulState.noData) {
-                return Center(
-                  child: Material(
-                    child: Text(state.message),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      Container(
+                        width: 100,
+                        height: 100,
+                        decoration: BoxDecoration(
+                            color: Colors.white,
+                            border: Border.all(color: Colors.grey),
+                            borderRadius: BorderRadius.circular(10)),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Image.asset("assets/badge.png"),
+                            Text("Murah",
+                                style: TextStyle(fontWeight: FontWeight.bold))
+                          ],
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.pushNamed(
+                              context, PageListFaveRestaurants.routeName);
+                        },
+                        child: Container(
+                          width: 100,
+                          height: 100,
+                          decoration: BoxDecoration(
+                              color: Colors.white,
+                              border: Border.all(color: Colors.grey),
+                              borderRadius: BorderRadius.circular(10)),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Image.asset("assets/loved.png"),
+                              Text(
+                                "Favorite",
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              )
+                            ],
+                          ),
+                        ),
+                      ),
+                      Container(
+                        width: 100,
+                        height: 100,
+                        decoration: BoxDecoration(
+                            color: Colors.white,
+                            border: Border.all(color: Colors.grey),
+                            borderRadius: BorderRadius.circular(10)),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Image.asset("assets/maps.png"),
+                            Text("Terlaris",
+                                style: TextStyle(fontWeight: FontWeight.bold))
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
-                );
-              } else if (state.state == ResulState.error) {
-                print(state.message);
-                if (state.message == '404') {
-                  return ComponentWidget.NoInternet();
-                } else {
-                  return Center(
-                    child: Material(
-                      child: Text(state.message),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                    child: Text(
+                      "Khusus Buat Kamu",
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 16.0),
                     ),
-                  );
-                }
-              } else {
-                return Center(
-                  child: Material(
-                    child: Text(''),
                   ),
-                );
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                    child: Text(
+                      "Promo spesial untuk dipakai waktu checkout",
+                      style: TextStyle(fontSize: 12),
+                    ),
+                  ),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 120,
+                    child: ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: 2,
+                      scrollDirection: Axis.horizontal,
+                      itemBuilder: (context, index) {
+                        return Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Container(
+                            width: 280,
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                color: Color.fromRGBO(250, 222, 222, 1)),
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 100,
+                                  height: 120,
+                                  decoration: BoxDecoration(
+                                      color: Color.fromRGBO(249, 186, 186, 1),
+                                      image: DecorationImage(
+                                          image: AssetImage("assets/disc.png")),
+                                      borderRadius: BorderRadius.circular(10)),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        "Special Discount!",
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16,
+                                            color: Color.fromRGBO(
+                                                204, 121, 121, 1)),
+                                      ),
+                                      Container(
+                                        width: 150,
+                                        child: Text(
+                                          "Diskon Makanan Murah sampai 20% tiap beli 20rb",
+                                          style: TextStyle(fontSize: 10.0),
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                    child: Text(
+                      "Restaurants Yang Cocok Buat Kamu",
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 16.0),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                    child: Text(
+                      "Makanan Enak , Minuman Enak dan Murah pasti ada!",
+                      style: TextStyle(fontSize: 12),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  ListView.builder(
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    itemCount: state.result.restaurants.length,
+                    itemBuilder: (context, index) {
+                      bool isFav =
+                          state.favorites[state.result.restaurants[index].id] ??
+                              false;
+                      return BoxRestaurantApiTest(
+                          data: state.result.restaurants[index],
+                          context: context,
+                          isFav: isFav,
+                          restt: state,
+                          route: PageDetailRestaurants.routeName);
+                    },
+                  ),
+                  SizedBox(
+                    height: 20,
+                  )
+                ],
+              ),
+            );
+          } else if (state.state == ResulState.noData) {
+            return Center(
+              child: Material(
+                child: Text(state.message),
+              ),
+            );
+          } else if (state.state == ResulState.error) {
+            print(state.message);
+            if (state.message == '404') {
+              return ComponentWidget.NoInternet();
+            } else {
+              return Center(
+                child: Material(
+                  child: Text(state.message),
+                ),
+              );
+            }
+          } else {
+            return Center(
+              child: Material(
+                child: Text(''),
+              ),
+            );
+          }
+        },
+      ),
+    ));
+  }
+
+  Widget BoxRestaurantApiTest(
+      {Restaurants? data,
+      BuildContext? context,
+      String? route,
+      bool? isFav,
+      RestaurantsProvider? restt}) {
+    return Column(
+      children: [
+        SizedBox(
+          height: 10,
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10.0),
+          child: GestureDetector(
+            onTap: () async {
+              // Navigator.pushNamed(context!, route!, arguments: data);
+              bool result = await Navigator.push(
+                  context!,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        PageDetailRestaurants(restaurants: data!),
+                  ));
+
+              if (result == true) {
+                restt!.getAllRestaurantsdb();
+                restt.loadFavorite();
               }
             },
+            child: Container(
+              width: double.infinity,
+              height: 200,
+              decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: Colors.black)),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    width: double.infinity,
+                    height: 140,
+                    child: Stack(
+                      children: [
+                        Container(
+                          width: double.infinity,
+                          height: 120,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            image: DecorationImage(
+                              image: NetworkImage(
+                                  "https://restaurant-api.dicoding.dev/images/medium/${data?.picId}"),
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                        Positioned(
+                          bottom: 5,
+                          left: 15,
+                          child: Container(
+                            width: 80,
+                            height: 30,
+                            decoration: BoxDecoration(
+                                color: Colors.green,
+                                borderRadius: BorderRadius.circular(10)),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.star,
+                                  color: Colors.amber.shade700,
+                                ),
+                                SizedBox(
+                                  width: 5.0,
+                                ),
+                                Text(
+                                  "${data?.rate}",
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white),
+                                )
+                              ],
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(left: 10.0),
+                            child: Text(
+                              "${data?.name} , ${data?.city}",
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 10.0),
+                            child: Container(
+                              width: 200,
+                              child: Text("${data?.desc}",
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.black,
+                                  )),
+                            ),
+                          ),
+                        ],
+                      ),
+                      IconButton(
+                          onPressed: () async {
+                            if (isFav) {
+                              await restt?.deleteRestaurantsDb("${data?.id}");
+                              restt?.updateFavoriteStatus("${data?.id}", false);
+                            } else {
+                              final rest = DbRestaurants(
+                                  id: data!.id.toString(),
+                                  name: data.name.toString(),
+                                  desc: data.desc.toString(),
+                                  picId: data.picId.toString(),
+                                  kota: data.city.toString(),
+                                  rating: data.rate.toString(),
+                                  fav: "True");
+                              await restt!.addRestaurantsDb(rest);
+                              restt.updateFavoriteStatus("${data.id}", true);
+                            }
+                          },
+                          icon: Icon(
+                            isFav! ? Icons.favorite : Icons.favorite_border,
+                            color: isFav ? Colors.red : null,
+                          ))
+                    ],
+                  ),
+                ],
+              ),
+            ),
           ),
-          SizedBox(
-            height: 20,
-          )
-        ],
-      ),
-    )));
+        ),
+      ],
+    );
   }
 }

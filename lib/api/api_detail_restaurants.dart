@@ -4,8 +4,15 @@ import 'dart:convert';
 import '../model/detail_restaurants.dart';
 
 class ApiDetailRestaurants {
+  http.Client? client;
+  ApiDetailRestaurants({this.client}) {
+    if (client == null) {
+      client = http.Client();
+    }
+  }
+
   Future<DetailRestaurants> fetchRestaurant({String? idRestaurants}) async {
-    final response = await http.get(Uri.parse(
+    final response = await client!.get(Uri.parse(
         'https://restaurant-api.dicoding.dev/detail/${idRestaurants}'));
 
     if (response.statusCode == 200) {

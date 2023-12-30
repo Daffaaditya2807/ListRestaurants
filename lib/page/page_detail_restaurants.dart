@@ -2,10 +2,12 @@ import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:restaurant_with_api/component/widget_build.dart';
+import 'package:restaurant_with_api/database/db_model_restaurants.dart';
 import 'package:restaurant_with_api/model/list_restaurants.dart';
 
 import '../model/detail_restaurants.dart';
-import '../provider/connectionprovider.dart';
+import '../provider/provider_addreviews_restaurants.dart';
+import '../provider/provider_detail_restaurants.dart';
 
 class PageDetailRestaurants extends StatefulWidget {
   static String routeName = '/detail_list_restaurants';
@@ -53,19 +55,29 @@ class _DetailRestaurantsState extends State<PageDetailRestaurants> {
           'Restaurant Details',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
+        leading: IconButton(
+            onPressed: () {
+              Navigator.pop(context, true);
+            },
+            icon: Icon(Icons.arrow_back)),
         centerTitle: true,
       ),
       body: Consumer<DetailRestaurantProvider>(
         builder: (context, state, _) {
-          if (state.state == ResulState.loading) {
+          if (state.state == ResultDetail.loading) {
             print("object");
             return const Center(
               child: CircularProgressIndicator(),
             );
-          } else if (state.state == ResulState.hasData) {
-            print("sini ka");
+          } else if (state.state == ResultDetail.hasData) {
+            print("sini ka = ${state.detail.id}");
+
+            bool isFav = state.isFavoriteById(state.detail.id);
+            print("apakah fav == ${isFav} ");
             return BuildDetailRestaurants(
               restaurants: state.detail,
+              isFav: isFav,
+              provider: state,
               pressed: () {
                 if (_formKey.currentState!.validate()) {
                   reviewProvider
@@ -93,13 +105,13 @@ class _DetailRestaurantsState extends State<PageDetailRestaurants> {
                 }
               },
             );
-          } else if (state.state == ResulState.noData) {
+          } else if (state.state == ResultDetail.noData) {
             return Center(
               child: Material(
                 child: Text(state.message),
               ),
             );
-          } else if (state.state == ResulState.error) {
+          } else if (state.state == ResultDetail.error) {
             if (state.message == '404') {
               return ComponentWidget.NoInternet();
             } else {
@@ -122,7 +134,10 @@ class _DetailRestaurantsState extends State<PageDetailRestaurants> {
   }
 
   Widget BuildDetailRestaurants(
-      {DetailRestaurants? restaurants, VoidCallback? pressed}) {
+      {DetailRestaurants? restaurants,
+      VoidCallback? pressed,
+      bool? isFav,
+      DetailRestaurantProvider? provider}) {
     return SingleChildScrollView(
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: 20.0),
@@ -130,15 +145,44 @@ class _DetailRestaurantsState extends State<PageDetailRestaurants> {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.max,
           children: [
-            Container(
-              width: double.infinity,
-              height: 200,
-              decoration: BoxDecoration(
-                  image: DecorationImage(
-                      image: NetworkImage(
-                          "https://restaurant-api.dicoding.dev/images/large/${restaurants!.pictureId}"),
-                      fit: BoxFit.cover),
-                  borderRadius: BorderRadius.circular(20.0)),
+            Stack(
+              children: [
+                Container(
+                  width: double.infinity,
+                  height: 200,
+                  decoration: BoxDecoration(
+                      image: DecorationImage(
+                          image: NetworkImage(
+                              "https://restaurant-api.dicoding.dev/images/large/${restaurants!.pictureId}"),
+                          fit: BoxFit.cover),
+                      borderRadius: BorderRadius.circular(20.0)),
+                ),
+                Positioned(
+                  right: 0.0,
+                  child: IconButton(
+                      onPressed: () {
+                        if (isFav) {
+                          provider!.removeFavorite(restaurants.id);
+                          provider.updateFavoriteStatus(restaurants.id, false);
+                        } else {
+                          final rest = DbRestaurants(
+                              id: restaurants.id,
+                              name: restaurants.name,
+                              desc: restaurants.description,
+                              picId: restaurants.pictureId,
+                              kota: restaurants.city,
+                              rating: restaurants.rating.toString(),
+                              fav: "True"); // Sesuaikan dengan data restoran
+                          provider!.addFavorite(rest);
+                          provider.updateFavoriteStatus(restaurants.id, true);
+                        }
+                      },
+                      icon: Icon(
+                        isFav! ? Icons.favorite : Icons.favorite_border,
+                        color: isFav ? Colors.red : null,
+                      )),
+                )
+              ],
             ),
             const SizedBox(
               height: 10,

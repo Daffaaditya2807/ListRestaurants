@@ -26,7 +26,7 @@ class ComponentWidget {
   }
 
   static Widget BoxRestaurantApi(
-      {Restaurants? data, BuildContext? context, String? route}) {
+      {Restaurants? data, BuildContext? context, String? route, String? fav}) {
     return Column(
       children: [
         SizedBox(
@@ -97,24 +97,49 @@ class ComponentWidget {
                       ],
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 10.0),
-                    child: Text(
-                      "${data?.name} , ${data?.city}",
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 10.0),
-                    child: Container(
-                      width: 200,
-                      child: Text("${data?.desc}",
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.black,
-                          )),
-                    ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(left: 10.0),
+                            child: Text(
+                              "${data?.name} , ${data?.city}",
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 10.0),
+                            child: Container(
+                              width: 200,
+                              child: Text("${data?.desc}",
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.black,
+                                  )),
+                            ),
+                          ),
+                        ],
+                      ),
+                      IconButton(
+                          onPressed: () {
+                            // final rest = DbRestaurants(
+                            //     id: "${data?.id}",
+                            //     name: "${data?.id}",
+                            //     desc: "${data?.id}",
+                            //     picId: "${data?.id}",
+                            //     kota: "${data?.id}",
+                            //     rating: "${data?.id}",
+                            //     fav: fav.toString());
+                            // Provider.of<RestaurantsProvider>(context!,
+                            //         listen: false)
+                            //     .addRestaurantsDb(rest);
+                          },
+                          icon: Icon(Icons.favorite_border_outlined))
+                    ],
                   ),
                 ],
               ),

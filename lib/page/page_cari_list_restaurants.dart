@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:restaurant_with_api/component/widget_build.dart';
-import 'package:restaurant_with_api/provider/connectionprovider.dart';
 
+import '../database/db_model_restaurants.dart';
+import '../model/list_restaurants.dart';
+import '../provider/provider_search_restaurants.dart';
 import 'page_detail_restaurants.dart';
 
 class PageCariListRestaurants extends StatefulWidget {
@@ -16,6 +18,16 @@ class PageCariListRestaurants extends StatefulWidget {
 class _PageCariListRestaurantsState extends State<PageCariListRestaurants> {
   TextEditingController _controllerCari = TextEditingController();
   bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    final provider =
+        Provider.of<CariRestaurantsProvider>(context, listen: false);
+    provider.getAllRestaurantsdb();
+    provider.loadFavorites();
+  }
+
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
@@ -29,6 +41,11 @@ class _PageCariListRestaurantsState extends State<PageCariListRestaurants> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Cari Restaurants"),
+        leading: IconButton(
+            onPressed: () {
+              Navigator.pop(context, true);
+            },
+            icon: Icon(Icons.arrow_back)),
       ),
       body: SafeArea(
           child: SingleChildScrollView(
@@ -71,7 +88,7 @@ class _PageCariListRestaurantsState extends State<PageCariListRestaurants> {
                   )
                 : Consumer<CariRestaurantsProvider>(
                     builder: (context, state, _) {
-                      if (state.state == ResulState.first) {
+                      if (state.state == ResultsCari.first) {
                         return SizedBox(
                           height: bodyHeight,
                           child: Center(
@@ -86,31 +103,36 @@ class _PageCariListRestaurantsState extends State<PageCariListRestaurants> {
                           ),
                         );
                       }
-                      if (state.state == ResulState.loading) {
+                      if (state.state == ResultsCari.loading) {
                         print(state.state);
                         return const Center(
                           child: CircularProgressIndicator(),
                         );
-                      } else if (state.state == ResulState.hasData) {
+                      } else if (state.state == ResultsCari.hasData) {
                         return ListView.builder(
                           shrinkWrap: true,
                           physics: NeverScrollableScrollPhysics(),
                           itemCount: state.searchResults?.restaurants.length,
                           itemBuilder: (context, index) {
-                            return ComponentWidget.BoxRestaurantApi(
+                            bool isFav = state.favorites[state
+                                    .searchResults?.restaurants[index].id] ??
+                                false;
+                            return BoxRestaurantApiTest(
                                 data: state.searchResults?.restaurants[index],
+                                isFav: isFav,
+                                restt: state,
                                 context: context,
                                 route: PageDetailRestaurants.routeName);
                           },
                         );
-                      } else if (state.state == ResulState.noData) {
+                      } else if (state.state == ResultsCari.noData) {
                         return SizedBox(
                           height: bodyHeight,
                           child: Center(
                             child: Text("Data Restaurants Tidak Ditemukan"),
                           ),
                         );
-                      } else if (state.state == ResulState.error) {
+                      } else if (state.state == ResultsCari.error) {
                         if (state.message == '404') {
                           return SizedBox(
                               height: bodyHeight,
@@ -135,6 +157,154 @@ class _PageCariListRestaurantsState extends State<PageCariListRestaurants> {
           ],
         ),
       )),
+    );
+  }
+
+  Widget BoxRestaurantApiTest(
+      {Restaurants? data,
+      BuildContext? context,
+      String? route,
+      bool? isFav,
+      CariRestaurantsProvider? restt}) {
+    return Column(
+      children: [
+        SizedBox(
+          height: 10,
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10.0),
+          child: GestureDetector(
+            onTap: () async {
+              // Navigator.pushNamed(context!, route!, arguments: data);
+              bool result = await Navigator.push(
+                  context!,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        PageDetailRestaurants(restaurants: data!),
+                  ));
+
+              if (result == true) {
+                restt!.getAllRestaurantsdb();
+                restt.loadFavorites();
+                print("Load at this");
+              }
+            },
+            child: Container(
+              width: double.infinity,
+              height: 200,
+              decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: Colors.black)),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    width: double.infinity,
+                    height: 140,
+                    child: Stack(
+                      children: [
+                        Container(
+                          width: double.infinity,
+                          height: 120,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            image: DecorationImage(
+                              image: NetworkImage(
+                                  "https://restaurant-api.dicoding.dev/images/medium/${data?.picId}"),
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                        Positioned(
+                          bottom: 5,
+                          left: 15,
+                          child: Container(
+                            width: 80,
+                            height: 30,
+                            decoration: BoxDecoration(
+                                color: Colors.green,
+                                borderRadius: BorderRadius.circular(10)),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.star,
+                                  color: Colors.amber.shade700,
+                                ),
+                                SizedBox(
+                                  width: 5.0,
+                                ),
+                                Text(
+                                  "${data?.rate}",
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white),
+                                )
+                              ],
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(left: 10.0),
+                            child: Text(
+                              "${data?.name} , ${data?.city}",
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 10.0),
+                            child: Container(
+                              width: 200,
+                              child: Text("${data?.desc}",
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.black,
+                                  )),
+                            ),
+                          ),
+                        ],
+                      ),
+                      IconButton(
+                          onPressed: () async {
+                            if (isFav) {
+                              await restt?.deleteRestaurantsDb("${data?.id}");
+                              restt?.updateFavoriteStatus("${data?.id}", false);
+                            } else {
+                              final rest = DbRestaurants(
+                                  id: data!.id.toString(),
+                                  name: data.name.toString(),
+                                  desc: data.desc.toString(),
+                                  picId: data.picId.toString(),
+                                  kota: data.city.toString(),
+                                  rating: data.rate.toString(),
+                                  fav: "True");
+                              await restt!.addRestaurantsDb(rest);
+                              restt.updateFavoriteStatus("${data.id}", true);
+                            }
+                          },
+                          icon: Icon(
+                            isFav! ? Icons.favorite : Icons.favorite_border,
+                            color: isFav ? Colors.red : null,
+                          ))
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

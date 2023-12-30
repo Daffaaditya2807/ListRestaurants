@@ -5,11 +5,15 @@ import 'package:restaurant_with_api/api/api_search_list_restaurants.dart';
 import 'package:restaurant_with_api/model/list_restaurants.dart';
 import 'package:restaurant_with_api/page/page_cari_list_restaurants.dart';
 import 'package:restaurant_with_api/page/page_detail_restaurants.dart';
+import 'package:restaurant_with_api/page/page_list_favorite_restaurants.dart';
 import 'package:restaurant_with_api/page/page_list_restaurant.dart';
 import 'package:restaurant_with_api/page/page_solash_screen.dart';
-import 'package:restaurant_with_api/provider/connectionprovider.dart';
+import 'package:restaurant_with_api/provider/provider_detail_restaurants.dart';
+import 'package:restaurant_with_api/provider/provider_list_restaurants.dart';
 
 import 'api/api_detail_restaurants.dart';
+import 'provider/provider_addreviews_restaurants.dart';
+import 'provider/provider_search_restaurants.dart';
 
 void main() {
   runApp(const MyApp());
@@ -49,7 +53,9 @@ class MyApp extends StatelessWidget {
               restaurants:
                   ModalRoute.of(context)?.settings.arguments as Restaurants),
           PageCariListRestaurants.routeName: (context) =>
-              PageCariListRestaurants()
+              PageCariListRestaurants(),
+          PageListFaveRestaurants.routeName: (context) =>
+              PageListFaveRestaurants()
         },
       ),
     );
