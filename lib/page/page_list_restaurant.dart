@@ -2,15 +2,16 @@ import 'dart:async';
 
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
+import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
 import 'package:provider/provider.dart';
 import 'package:restaurant_with_api/database/db_model_restaurants.dart';
 import 'package:restaurant_with_api/page/page_cari_list_restaurants.dart';
 import 'package:restaurant_with_api/page/page_list_favorite_restaurants.dart';
 import 'package:restaurant_with_api/provider/provider_list_restaurants.dart';
 
+import '../component/notification_helper.dart';
 import '../component/widget_build.dart';
 import '../model/list_restaurants.dart';
 import 'page_detail_restaurants.dart';
@@ -31,6 +32,12 @@ class _PageListRestaurantsState extends State<PageListRestaurants> {
     super.initState();
     _determinePosition();
     _getCurrentPosition();
+  }
+
+  @override
+  void dispose() {
+    selectNotificationSubject.close();
+    super.dispose();
   }
 
   Future<Position> _determinePosition() async {
@@ -214,20 +221,20 @@ class _PageListRestaurantsState extends State<PageListRestaurants> {
                                   border: Border.all(color: Colors.grey)),
                               child: TextField(
                                 onTap: () async {
-                                  // Navigator.pushNamed(
-                                  //     context, PageCariListRestaurants.routeName);
+                                  var result = await PersistentNavBarNavigator
+                                      .pushNewScreen(
+                                    context,
+                                    screen: PageCariListRestaurants(),
+                                    withNavBar: true,
+                                    pageTransitionAnimation:
+                                        PageTransitionAnimation.cupertino,
+                                  );
 
-                                  bool result = await Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            PageCariListRestaurants(),
-                                      ));
-                                  print("Hasil Route ${result}");
-                                  if (result == true) {
+                                  String checkResult = result.toString();
+                                  if (checkResult == 'true' ||
+                                      checkResult == 'null') {
                                     state.getAllRestaurantsdb();
                                     state.loadFavorite();
-                                    print("gassin sini");
                                   }
                                 },
                                 enabled: true,
@@ -267,8 +274,16 @@ class _PageListRestaurantsState extends State<PageListRestaurants> {
                       ),
                       GestureDetector(
                         onTap: () {
-                          Navigator.pushNamed(
-                              context, PageListFaveRestaurants.routeName);
+                          PersistentNavBarNavigator
+                              .pushNewScreenWithRouteSettings(
+                            context,
+                            settings: RouteSettings(
+                                name: PageListFaveRestaurants.routeName),
+                            screen: PageListFaveRestaurants(),
+                            withNavBar: true,
+                            pageTransitionAnimation:
+                                PageTransitionAnimation.cupertino,
+                          );
                         },
                         child: Container(
                           width: 100,
@@ -421,7 +436,7 @@ class _PageListRestaurantsState extends State<PageListRestaurants> {
                     },
                   ),
                   SizedBox(
-                    height: 20,
+                    height: 40,
                   )
                 ],
               ),
@@ -470,15 +485,15 @@ class _PageListRestaurantsState extends State<PageListRestaurants> {
           padding: const EdgeInsets.symmetric(horizontal: 10.0),
           child: GestureDetector(
             onTap: () async {
-              // Navigator.pushNamed(context!, route!, arguments: data);
-              bool result = await Navigator.push(
-                  context!,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        PageDetailRestaurants(restaurants: data!),
-                  ));
+              var result = await PersistentNavBarNavigator.pushNewScreen(
+                context!,
+                screen: PageDetailRestaurants(restaurants: data!),
+                withNavBar: true,
+                pageTransitionAnimation: PageTransitionAnimation.cupertino,
+              );
 
-              if (result == true) {
+              String checkResult = result.toString();
+              if (checkResult == 'true' || checkResult == 'null') {
                 restt!.getAllRestaurantsdb();
                 restt.loadFavorite();
               }

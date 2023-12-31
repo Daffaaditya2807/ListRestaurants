@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
 import 'package:provider/provider.dart';
 import 'package:restaurant_with_api/component/widget_build.dart';
 
@@ -36,7 +37,6 @@ class _PageCariListRestaurantsState extends State<PageCariListRestaurants> {
     double heightSearch = 50.0;
     double bodyHeight = screenHeight - topPadding - appBarHeight - heightSearch;
 
-    print(screenHeight);
     // TODO: implement build
     return Scaffold(
       appBar: AppBar(
@@ -168,7 +168,7 @@ class _PageCariListRestaurantsState extends State<PageCariListRestaurants> {
       CariRestaurantsProvider? restt}) {
     return Column(
       children: [
-        SizedBox(
+        const SizedBox(
           height: 10,
         ),
         Padding(
@@ -176,12 +176,12 @@ class _PageCariListRestaurantsState extends State<PageCariListRestaurants> {
           child: GestureDetector(
             onTap: () async {
               // Navigator.pushNamed(context!, route!, arguments: data);
-              bool result = await Navigator.push(
-                  context!,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        PageDetailRestaurants(restaurants: data!),
-                  ));
+              bool result = await PersistentNavBarNavigator.pushNewScreen(
+                context!,
+                screen: PageDetailRestaurants(restaurants: data!),
+                withNavBar: true, // OPTIONAL VALUE. True by default.
+                pageTransitionAnimation: PageTransitionAnimation.cupertino,
+              );
 
               if (result == true) {
                 restt!.getAllRestaurantsdb();

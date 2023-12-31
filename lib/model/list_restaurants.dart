@@ -10,6 +10,8 @@ class ListRestaurants {
           error: json['error'].toString(),
           restaurants: List<Restaurants>.from(
               json['restaurants'].map((x) => Restaurants.fromJson(x))));
+
+  Map<String, dynamic> toJson() => {"error": error, "restaurants": restaurants};
 }
 
 class Restaurants {
@@ -35,4 +37,13 @@ class Restaurants {
       picId: json['pictureId'],
       city: json['city'],
       rate: json['rating'].toString());
+
+  Map<String, dynamic> toJson() => {
+        "id": id,
+        "name": name,
+        "description": desc,
+        "pictureId": picId,
+        "city": city,
+        "rating": rate
+      };
 }

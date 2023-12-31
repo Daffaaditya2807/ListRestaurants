@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
-import 'package:restaurant_with_api/page/page_list_restaurant.dart';
+import 'package:restaurant_with_api/page/page_bottom_bar.dart';
 
 class SplashScreen extends StatefulWidget {
   static String routeName = "/splashscreen";
@@ -19,7 +19,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
   void _nextPages() async {
     Future.delayed(Duration(milliseconds: 3000), () {
-      Navigator.pushReplacementNamed(context, PageListRestaurants.routeName);
+      Navigator.pushReplacementNamed(context, PageBottomBar.routeName);
     });
   }
 

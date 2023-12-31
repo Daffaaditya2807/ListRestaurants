@@ -38,13 +38,6 @@ class _DetailRestaurantsState extends State<PageDetailRestaurants> {
   }
 
   @override
-  void dispose() {
-    // TODO: implement dispose
-
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     final reviewProvider =
         Provider.of<ReviewsAddProviders>(context, listen: false);
@@ -57,6 +50,7 @@ class _DetailRestaurantsState extends State<PageDetailRestaurants> {
         ),
         leading: IconButton(
             onPressed: () {
+              print("kembali dari sinii");
               Navigator.pop(context, true);
             },
             icon: Icon(Icons.arrow_back)),
@@ -65,15 +59,14 @@ class _DetailRestaurantsState extends State<PageDetailRestaurants> {
       body: Consumer<DetailRestaurantProvider>(
         builder: (context, state, _) {
           if (state.state == ResultDetail.loading) {
-            print("object");
             return const Center(
               child: CircularProgressIndicator(),
             );
           } else if (state.state == ResultDetail.hasData) {
-            print("sini ka = ${state.detail.id}");
+            // print("sini ka = ${state.detail.id}");
 
             bool isFav = state.isFavoriteById(state.detail.id);
-            print("apakah fav == ${isFav} ");
+            // print("apakah fav == ${isFav} ");
             return BuildDetailRestaurants(
               restaurants: state.detail,
               isFav: isFav,
@@ -122,7 +115,7 @@ class _DetailRestaurantsState extends State<PageDetailRestaurants> {
               );
             }
           } else {
-            return Center(
+            return const Center(
               child: Material(
                 child: Text(''),
               ),

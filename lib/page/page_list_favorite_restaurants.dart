@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
 import 'package:provider/provider.dart';
 import 'package:restaurant_with_api/model/list_restaurants.dart';
 import 'package:restaurant_with_api/provider/provider_list_restaurants.dart';
@@ -69,7 +70,7 @@ class _PageListFaveRestaurantsState extends State<PageListFaveRestaurants> {
                     );
                   }
                 } else {
-                  return Center(
+                  return const Center(
                     child: Material(
                       child: Text(''),
                     ),
@@ -91,7 +92,7 @@ class _PageListFaveRestaurantsState extends State<PageListFaveRestaurants> {
       RestaurantsProvider? restt}) {
     return Column(
       children: [
-        SizedBox(
+        const SizedBox(
           height: 10,
         ),
         Padding(
@@ -105,14 +106,15 @@ class _PageListFaveRestaurantsState extends State<PageListFaveRestaurants> {
                   picId: data.picId,
                   city: data.kota,
                   rate: data.rating);
-              bool result = await Navigator.push(
-                  context!,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        PageDetailRestaurants(restaurants: restaurants),
-                  ));
+              var result = await PersistentNavBarNavigator.pushNewScreen(
+                context!,
+                screen: PageDetailRestaurants(restaurants: restaurants),
+                withNavBar: true,
+                pageTransitionAnimation: PageTransitionAnimation.cupertino,
+              );
 
-              if (result == true) {
+              String checkResult = result.toString();
+              if (checkResult == 'true' || checkResult == 'null') {
                 restt!.getAllRestaurantsdb();
                 restt.loadFavorite();
               }
@@ -160,12 +162,12 @@ class _PageListFaveRestaurantsState extends State<PageListFaveRestaurants> {
                                   Icons.star,
                                   color: Colors.amber.shade700,
                                 ),
-                                SizedBox(
+                                const SizedBox(
                                   width: 5.0,
                                 ),
                                 Text(
                                   "${data?.rating}",
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                       fontWeight: FontWeight.bold,
                                       color: Colors.white),
                                 )
