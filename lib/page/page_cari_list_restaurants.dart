@@ -176,14 +176,15 @@ class _PageCariListRestaurantsState extends State<PageCariListRestaurants> {
           child: GestureDetector(
             onTap: () async {
               // Navigator.pushNamed(context!, route!, arguments: data);
-              bool result = await PersistentNavBarNavigator.pushNewScreen(
+              var result = await PersistentNavBarNavigator.pushNewScreen(
                 context!,
                 screen: PageDetailRestaurants(restaurants: data!),
                 withNavBar: true, // OPTIONAL VALUE. True by default.
                 pageTransitionAnimation: PageTransitionAnimation.cupertino,
               );
 
-              if (result == true) {
+              String checkResult = result.toString();
+              if (checkResult == 'true' || checkResult == 'null') {
                 restt!.getAllRestaurantsdb();
                 restt.loadFavorites();
                 print("Load at this");

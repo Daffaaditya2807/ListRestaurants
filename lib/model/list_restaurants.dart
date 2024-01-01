@@ -5,11 +5,15 @@ class ListRestaurants {
 
   ListRestaurants({required this.error, required this.restaurants});
 
-  factory ListRestaurants.fromJson(Map<String, dynamic> json) =>
-      ListRestaurants(
-          error: json['error'].toString(),
-          restaurants: List<Restaurants>.from(
-              json['restaurants'].map((x) => Restaurants.fromJson(x))));
+  factory ListRestaurants.fromJson(Map<String, dynamic> json) {
+    var restaurantList = json['restaurants'] as List?;
+    List<Restaurants> restaurants = [];
+    if (restaurantList != null) {
+      restaurants = restaurantList.map((x) => Restaurants.fromJson(x)).toList();
+    }
+    return ListRestaurants(
+        error: json['error'].toString(), restaurants: restaurants);
+  }
 
   Map<String, dynamic> toJson() => {"error": error, "restaurants": restaurants};
 }
